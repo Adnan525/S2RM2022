@@ -4,3 +4,78 @@ author: "Muntasir Adnan"
 date: "06/11/2022"
 output: html_document
 ---
+
+## usap
+```{r}
+library(tidyverse)
+df <- read.csv("usap.csv")
+
+regModel <- lm(vs ~ gr + pwh + gr*pwh, data=df)
+summary(regModel)
+```
+## longley
+```{r}
+library(datasets)
+library(caTools)
+library(glmnet)
+library(caret)
+data("longley")
+index = 1:12
+train <- longley[index,]
+test <- longley[-index,]
+trainX <- data.matrix(train[,c("GNP.deflator", "GNP", "Unemployed", "Armed.Forces", "Population", "Year")])
+testX <- data.matrix(test[,c("GNP.deflator", "GNP", "Unemployed", "Armed.Forces", "Population", "Year")])
+trainY <- train$Employed
+testY <- test$Employed
+myModel <- glmnet(trainX, trainY, alpha = 0, lambda = 0.01)
+myModelPredict <- predict(myModel, s = 0.01, newx = testX)
+RMSE(testY, myModelPredict)
+caret::R2(testY, myModelPredict)
+coef(myModel)
+testY[1] - myModelPredict[1,1]
+(testY[1] - myModelPredict[1,1])+(testY[2] - myModelPredict[2,1])+(testY[3] - myModelPredict[3,1])+(testY[4] - myModelPredict[4,1])
+
+
+```
+## motorins
+```{r}
+library(faraway) 
+data("motorins")
+dim(motorins)
+```
+# iris
+```{r}
+data("iris")
+library(caret)
+df <- iris[21:150,]
+# iris_model <- rpart(formula = Species ~.,
+#                     data = df,
+#                     method = "class",
+#                     control = rpart.control(cp = 0),
+#                     parms = list(split = "information"))
+iris_model <- train(Species ~.,
+                    data = df,
+                    method = "rpart",
+                    trControl = trainControl("cv", number = 10),
+                    preProcess = c("scale"),
+                    tuneLength = 20
+                    )
+iris_model
+library(rattle)
+fancyRpartPlot(iris_model$finalModel)
+
+# 1 petal.width < 2.5
+# 2 petal.length < 1.5
+```
+
+
+
+
+
+
+
+
+
+
+
+
